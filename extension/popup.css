@@ -83,6 +83,36 @@ button {
   background: #0369a1;
 }
 
+.settings {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid #334155;
+}
+
+.settings h2 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+  font-weight: 400;
+}
+
+.check-row input {
+  width: 16px;
+  height: 16px;
+}
+
+.settings-button {
+  margin-top: 12px;
+  color: #e0f2fe;
+  background: #475569;
+}
+
 button:hover {
   filter: brightness(1.08);
 }
