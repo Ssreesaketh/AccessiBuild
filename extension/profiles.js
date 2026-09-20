@@ -88,13 +88,19 @@ globalThis.ACCESSIBILITY_PROFILES = {
   },
   elder: {
     name: "Easy Read",
-    description: "Increase text size, line spacing, contrast, cursor visibility, and control sizes.",
+    description: "Increase text size, spacing, and readable contrast while preserving control colors.",
     css: `
       html { font-size: 118% !important; }
-      body { background-color: #fdf6e3 !important; color: #111827 !important; }
-      body * { color: #111827 !important; }
+      html, body { background-color: #fdf6e3 !important; }
+      body { color: #111827 !important; }
+      p, li, h1, h2, h3, h4, h5, h6, blockquote, figcaption, label {
+        color: #111827 !important;
+      }
+      a { color: #0645ad !important; text-decoration: underline !important; }
       p, li { line-height: 1.9 !important; }
-      a { text-decoration: underline !important; }
+      button, input, select, textarea, [role="button"] {
+        color: revert !important;
+      }
     `
   },
   photosensitive: {
