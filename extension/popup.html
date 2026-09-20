@@ -64,7 +64,17 @@
     <button id="analyze" class="ai">Analyze page</button>
     <p class="helper-text">Uses a local backend with lightweight heuristic checks. It is not a full WCAG compliance audit.</p>
     <p id="status" role="status" aria-live="polite"></p>
-    <pre id="analysis" hidden></pre>
+
+    <section id="analysisPanel" class="analysis-panel" hidden aria-labelledby="analysisTitle">
+      <h2 id="analysisTitle">Accessibility findings</h2>
+      <div id="analysisMeta" class="analysis-meta"></div>
+      <div id="analysisFindings" class="analysis-list"></div>
+      <div id="analysisRecommendations" class="analysis-list"></div>
+      <details>
+        <summary>View raw analysis response</summary>
+        <pre id="analysis"></pre>
+      </details>
+    </section>
   </main>
   <script src="profiles.js"></script>
   <script src="popup.js"></script>
