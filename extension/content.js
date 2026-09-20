@@ -1,8 +1,14 @@
 const STYLE_ID = "accessibuild-profile-style";
 const STATE_KEY = "accessibuildActiveProfile";
+const CURSOR_TOKEN = "__ACCESSIBUILD_CURSOR__";
 
 function removeAccessiBuildStyles() {
   document.getElementById(STYLE_ID)?.remove();
+}
+
+function resolveProfileCss(css) {
+  const cursorUrl = chrome.runtime.getURL("accessibuild-cursor.svg");
+  return css.replaceAll(CURSOR_TOKEN, cursorUrl);
 }
 
 function applyProfile(profileKey) {
@@ -13,7 +19,7 @@ function applyProfile(profileKey) {
   const style = document.createElement("style");
   style.id = STYLE_ID;
   style.dataset.accessibuild = profileKey;
-  style.textContent = profile.css;
+  style.textContent = resolveProfileCss(profile.css);
   (document.head || document.documentElement).appendChild(style);
 }
 
@@ -51,7 +57,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
-// Profiles are injected by profiles.js through the popup message bundle.
+// Profiles are injected by profiles.js through the content script bundle.
 // The fallback style map keeps the content script safe when loaded alone.
 globalThis.ACCESSIBILITY_PROFILES = globalThis.ACCESSIBILITY_PROFILES || {
   normal: { css: "" }
