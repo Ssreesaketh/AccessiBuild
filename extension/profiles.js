@@ -1,5 +1,5 @@
 const COMMON_ACCESSIBILITY_CSS = `
-  /* Shared improvements for every accessibility profile. */
+  /* Shared improvements for every enhanced accessibility profile. */
   button, input[type="button"], input[type="submit"], input[type="reset"],
   select, textarea, summary {
     min-height: 44px !important;
@@ -8,11 +8,11 @@ const COMMON_ACCESSIBILITY_CSS = `
 
   button, input[type="button"], input[type="submit"], input[type="reset"],
   a, select, summary {
-    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M5 2 L5 25 L12 19 L17 30 L22 27 L17 16 L27 16 Z' fill='white' stroke='black' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") 5 2, pointer !important;
+    cursor: url("__ACCESSIBUILD_CURSOR__") 4 2, pointer !important;
   }
 
   body, body * {
-    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M5 2 L5 25 L12 19 L17 30 L22 27 L17 16 L27 16 Z' fill='white' stroke='black' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") 5 2, auto;
+    cursor: url("__ACCESSIBUILD_CURSOR__") 4 2, auto !important;
   }
 
   :focus-visible {
@@ -42,7 +42,7 @@ globalThis.ACCESSIBILITY_PROFILES = {
   },
   low_vision: {
     name: "Low Vision",
-    description: "Increase text size, contrast, focus visibility, and control sizes.",
+    description: "Increase text size, contrast, focus visibility, cursor visibility, and control sizes.",
     css: `
       html { font-size: 112.5% !important; }
       body { filter: contrast(1.12) !important; }
@@ -88,10 +88,11 @@ globalThis.ACCESSIBILITY_PROFILES = {
   },
   elder: {
     name: "Easy Read",
-    description: "Increase text size, line spacing, cursor visibility, and control sizes.",
+    description: "Increase text size, line spacing, contrast, cursor visibility, and control sizes.",
     css: `
       html { font-size: 118% !important; }
       body { background-color: #fdf6e3 !important; color: #111827 !important; }
+      body * { color: #111827 !important; }
       p, li { line-height: 1.9 !important; }
       a { text-decoration: underline !important; }
     `
