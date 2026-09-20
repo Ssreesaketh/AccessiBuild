@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "AccessiBuild",
+  "version": "0.1.0",
+  "description": "Manual accessibility profiles with optional AI-powered page analysis.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "action": {
+    "default_title": "AccessiBuild",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
