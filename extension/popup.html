@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AccessiBuild</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <span class="eyebrow">ACCESSIBILITY TOOLKIT</span>
+      <h1>AccessiBuild</h1>
+      <p>Adapt the current webpage to your preferred accessibility profile.</p>
+    </header>
+
+    <label for="profile">Choose a profile</label>
+    <select id="profile">
+      <option value="normal">Normal</option>
+      <option value="low_vision">Low Vision</option>
+      <option value="dyslexia">Dyslexia Friendly</option>
+      <option value="adhd">ADHD Focus</option>
+      <option value="autism">Sensory Friendly</option>
+      <option value="motor">Motor Support</option>
+      <option value="elder">Easy Read</option>
+      <option value="photosensitive">No Motion</option>
+    </select>
+
+    <div class="actions">
+      <button id="apply" class="primary">Apply profile</button>
+      <button id="reset" class="secondary">Reset</button>
+    </div>
+
+    <section class="settings" aria-labelledby="settings-title">
+      <h2 id="settings-title">Common settings</h2>
+      <label for="textScale">Text size</label>
+      <select id="textScale">
+        <option value="100">Normal</option>
+        <option value="110">Slightly larger</option>
+        <option value="125">Large</option>
+        <option value="140">Extra large</option>
+      </select>
+
+      <label for="lineSpacing">Line spacing</label>
+      <select id="lineSpacing">
+        <option value="100">Normal</option>
+        <option value="130">Comfortable</option>
+        <option value="160">Wide</option>
+        <option value="190">Extra wide</option>
+      </select>
+
+      <label for="cursorSize">Cursor size preference</label>
+      <select id="cursorSize">
+        <option value="64">Large</option>
+        <option value="96">Extra large</option>
+        <option value="128">Very large</option>
+      </select>
+
+      <label class="check-row"><input type="checkbox" id="highContrast" /> Increase contrast</label>
+      <label class="check-row"><input type="checkbox" id="reducedMotion" /> Reduce motion</label>
+      <button id="applySettings" class="settings-button">Apply common settings</button>
+    </section>
+
+    <button id="analyze" class="ai">Analyze page</button>
+    <p class="helper-text">Uses a local backend with lightweight heuristic checks. It is not a full WCAG compliance audit.</p>
+    <p id="status" role="status" aria-live="polite"></p>
+
+    <section id="analysisPanel" class="analysis-panel" hidden aria-labelledby="analysisTitle">
+      <h2 id="analysisTitle">Accessibility findings</h2>
+      <div id="analysisMeta" class="analysis-meta"></div>
+      <div id="analysisFindings" class="analysis-list"></div>
+      <div id="analysisRecommendations" class="analysis-list"></div>
+      <details>
+        <summary>View raw analysis response</summary>
+        <pre id="analysis"></pre>
+      </details>
+    </section>
+  </main>
+  <script src="profiles.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

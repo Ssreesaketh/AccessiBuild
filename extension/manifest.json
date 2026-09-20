@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "AccessiBuild",
+  "version": "0.1.0",
+  "description": "Manual accessibility profiles with local heuristic page analysis.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "action": {
+    "default_title": "AccessiBuild",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["profiles.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["accessibuild-cursor.svg"],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ]
+}
