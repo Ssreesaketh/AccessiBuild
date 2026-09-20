@@ -1,4 +1,4 @@
-const ACCESSIBILITY_PROFILES = {
+globalThis.ACCESSIBILITY_PROFILES = {
   normal: {
     name: "Normal",
     description: "Remove AccessiBuild modifications.",
