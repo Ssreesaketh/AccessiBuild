@@ -1,4 +1,4 @@
-const BACKEND_URL = "http://127.0.0.1:5000";
+const BACKEND_URL = "http://127.0.0.1:5001";
 const PROFILE_KEY = "accessibuildActiveProfile";
 
 const profileSelect = document.getElementById("profile");
@@ -28,6 +28,10 @@ function sendToTab(tabId, message) {
     chrome.tabs.sendMessage(tabId, message, (response) => {
       if (chrome.runtime.lastError) {
         reject(new Error(chrome.runtime.lastError.message));
+        return;
+      }
+      if (!response?.ok) {
+        reject(new Error("The page did not respond correctly."));
         return;
       }
       resolve(response);
@@ -87,10 +91,10 @@ document.getElementById("analyze").addEventListener("click", async () => {
 
     const result = await response.json();
     analysisElement.textContent = JSON.stringify(result, null, 2);
-    setStatus("AI analysis completed.");
+    setStatus("Accessibility analysis completed.");
   } catch (error) {
-    analysisElement.textContent = "AI analysis is not available yet.\n\n" + error.message;
-    setStatus("AI backend unavailable.", true);
+    analysisElement.textContent = "Analysis is not available.\n\n" + error.message;
+    setStatus("Analysis backend unavailable.", true);
   }
 });
 
