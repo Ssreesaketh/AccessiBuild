@@ -1,9 +1,11 @@
 const STYLE_ID = "accessibuild-profile-style";
+const SETTINGS_STYLE_ID = "accessibuild-settings-style";
 const STATE_KEY = "accessibuildActiveProfile";
+const SETTINGS_KEY = "accessibuildSettings";
 const CURSOR_TOKEN = "__ACCESSIBUILD_CURSOR__";
 
-function removeAccessiBuildStyles() {
-  document.getElementById(STYLE_ID)?.remove();
+function removeStyle(id) {
+  document.getElementById(id)?.remove();
 }
 
 function resolveProfileCss(css) {
@@ -12,7 +14,7 @@ function resolveProfileCss(css) {
 }
 
 function applyProfile(profileKey) {
-  removeAccessiBuildStyles();
+  removeStyle(STYLE_ID);
   const profile = globalThis.ACCESSIBILITY_PROFILES?.[profileKey];
   if (!profile || !profile.css) return;
 
@@ -23,9 +25,32 @@ function applyProfile(profileKey) {
   (document.head || document.documentElement).appendChild(style);
 }
 
-function loadProfileFromStorage() {
-  chrome.storage.local.get([STATE_KEY], (result) => {
+function applySettings(settings = {}) {
+  removeStyle(SETTINGS_STYLE_ID);
+  const textScale = Number(settings.textScale || 100);
+  const lineSpacing = Number(settings.lineSpacing || 100);
+  const cursorSize = Number(settings.cursorSize || 64);
+  const highContrast = Boolean(settings.highContrast);
+  const reducedMotion = Boolean(settings.reducedMotion);
+  const cursorUrl = chrome.runtime.getURL("accessibuild-cursor.svg");
+
+  const style = document.createElement("style");
+  style.id = SETTINGS_STYLE_ID;
+  style.textContent = `
+    html { font-size: ${textScale}% !important; }
+    body, body * { cursor: url("${cursorUrl}") 4 2, auto !important; }
+    body * { line-height: ${lineSpacing}% !important; }
+    ${highContrast ? "html { filter: contrast(1.25) !important; }" : ""}
+    ${reducedMotion ? "*, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }" : ""}
+    ${cursorSize > 64 ? `body, body * { cursor: url(\"${cursorUrl}\") 4 2, auto !important; }` : ""}
+  `;
+  (document.head || document.documentElement).appendChild(style);
+}
+
+function loadSavedState() {
+  chrome.storage.local.get([STATE_KEY, SETTINGS_KEY], (result) => {
     applyProfile(result[STATE_KEY] || "normal");
+    applySettings(result[SETTINGS_KEY] || {});
   });
 }
 
@@ -36,9 +61,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse({ ok: true });
   }
 
+  if (message?.type === "ACCESSIBUILD_APPLY_SETTINGS") {
+    applySettings(message.settings);
+    chrome.storage.local.set({ [SETTINGS_KEY]: message.settings });
+    sendResponse({ ok: true });
+  }
+
   if (message?.type === "ACCESSIBUILD_RESET") {
     applyProfile("normal");
-    chrome.storage.local.set({ [STATE_KEY]: "normal" });
+    applySettings({});
+    chrome.storage.local.set({ [STATE_KEY]: "normal", [SETTINGS_KEY]: {} });
     sendResponse({ ok: true });
   }
 
@@ -57,10 +89,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
-// Profiles are injected by profiles.js through the content script bundle.
-// The fallback style map keeps the content script safe when loaded alone.
-globalThis.ACCESSIBILITY_PROFILES = globalThis.ACCESSIBILITY_PROFILES || {
-  normal: { css: "" }
-};
-
-loadProfileFromStorage();
+globalThis.ACCESSIBILITY_PROFILES = globalThis.ACCESSIBILITY_PROFILES || { normal: { css: "" } };
+loadSavedState();
