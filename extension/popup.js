@@ -39,9 +39,29 @@ function sendToTab(tabId, message) {
   });
 }
 
+async function injectContentScripts(tabId) {
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    files: ["profiles.js", "content.js"]
+  });
+}
+
+async function sendToTabWithFallback(tabId, message) {
+  try {
+    return await sendToTab(tabId, message);
+  } catch (firstError) {
+    try {
+      await injectContentScripts(tabId);
+      return await sendToTab(tabId, message);
+    } catch (secondError) {
+      throw new Error(secondError.message || firstError.message);
+    }
+  }
+}
+
 async function applyProfile(profile) {
   const tab = await getActiveTab();
-  await sendToTab(tab.id, {
+  await sendToTabWithFallback(tab.id, {
     type: "ACCESSIBUILD_APPLY_PROFILE",
     profile
   });
@@ -60,7 +80,7 @@ document.getElementById("apply").addEventListener("click", async () => {
 document.getElementById("reset").addEventListener("click", async () => {
   try {
     const tab = await getActiveTab();
-    await sendToTab(tab.id, { type: "ACCESSIBUILD_RESET" });
+    await sendToTabWithFallback(tab.id, { type: "ACCESSIBUILD_RESET" });
     profileSelect.value = "normal";
     await chrome.storage.local.set({ [PROFILE_KEY]: "normal" });
     setStatus("AccessiBuild changes were reset.");
@@ -75,7 +95,7 @@ document.getElementById("analyze").addEventListener("click", async () => {
 
   try {
     const tab = await getActiveTab();
-    const summary = await sendToTab(tab.id, {
+    const summary = await sendToTabWithFallback(tab.id, {
       type: "ACCESSIBUILD_PAGE_SUMMARY"
     });
 
