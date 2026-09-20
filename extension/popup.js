@@ -4,6 +4,10 @@ const SETTINGS_KEY = "accessibuildSettings";
 
 const profileSelect = document.getElementById("profile");
 const statusElement = document.getElementById("status");
+const analysisPanel = document.getElementById("analysisPanel");
+const analysisMeta = document.getElementById("analysisMeta");
+const analysisFindings = document.getElementById("analysisFindings");
+const analysisRecommendations = document.getElementById("analysisRecommendations");
 const analysisElement = document.getElementById("analysis");
 
 function setStatus(message, isError = false) {
@@ -85,6 +89,62 @@ async function applySettings() {
   setStatus("Common accessibility settings applied.");
 }
 
+function createTextElement(tagName, className, text) {
+  const element = document.createElement(tagName);
+  if (className) element.className = className;
+  element.textContent = text || "";
+  return element;
+}
+
+function renderAnalysis(result) {
+  analysisPanel.hidden = false;
+  analysisMeta.replaceChildren();
+  analysisFindings.replaceChildren();
+  analysisRecommendations.replaceChildren();
+
+  const pageTitle = result.page?.title || "Untitled page";
+  const pageUrl = result.page?.url || "URL unavailable";
+  analysisMeta.append(
+    createTextElement("strong", "analysis-page-title", pageTitle),
+    createTextElement("span", "analysis-page-url", pageUrl)
+  );
+
+  analysisFindings.append(createTextElement("h3", "analysis-section-title", "Findings"));
+  const findings = Array.isArray(result.findings) ? result.findings : [];
+  if (findings.length === 0) {
+    analysisFindings.append(createTextElement("p", "empty-state", "No findings were returned."));
+  } else {
+    findings.forEach((finding) => {
+      const card = document.createElement("article");
+      card.className = `finding-card ${finding.type || "potential_issue"}`;
+      card.append(
+        createTextElement("strong", "finding-type", (finding.type || "finding").replaceAll("_", " ")),
+        createTextElement("p", "finding-issue", finding.issue),
+        createTextElement("p", "finding-impact", `Impact: ${finding.impact || "Not specified"}`)
+      );
+      analysisFindings.append(card);
+    });
+  }
+
+  analysisRecommendations.append(createTextElement("h3", "analysis-section-title", "Recommendations"));
+  const recommendations = Array.isArray(result.recommendations) ? result.recommendations : [];
+  if (recommendations.length === 0) {
+    analysisRecommendations.append(createTextElement("p", "empty-state", "No recommendations were returned."));
+  } else {
+    const list = document.createElement("ul");
+    recommendations.forEach((recommendation) => {
+      list.append(createTextElement("li", "recommendation-item", recommendation));
+    });
+    analysisRecommendations.append(list);
+  }
+
+  if (result.disclaimer) {
+    analysisRecommendations.append(createTextElement("p", "analysis-disclaimer", result.disclaimer));
+  }
+
+  analysisElement.textContent = JSON.stringify(result, null, 2);
+}
+
 document.getElementById("apply").addEventListener("click", async () => {
   try {
     await applyProfile(profileSelect.value);
@@ -119,8 +179,11 @@ document.getElementById("reset").addEventListener("click", async () => {
 });
 
 document.getElementById("analyze").addEventListener("click", async () => {
-  analysisElement.hidden = false;
-  analysisElement.textContent = "Analyzing...";
+  analysisPanel.hidden = false;
+  analysisMeta.replaceChildren();
+  analysisFindings.replaceChildren(createTextElement("p", "empty-state", "Analyzing the current page..."));
+  analysisRecommendations.replaceChildren();
+  analysisElement.textContent = "";
 
   try {
     const tab = await getActiveTab();
@@ -133,10 +196,12 @@ document.getElementById("analyze").addEventListener("click", async () => {
 
     if (!response.ok) throw new Error(`Backend returned HTTP ${response.status}`);
     const result = await response.json();
-    analysisElement.textContent = JSON.stringify(result, null, 2);
+    renderAnalysis(result);
     setStatus("Accessibility analysis completed.");
   } catch (error) {
-    analysisElement.textContent = "Analysis is not available.\n\n" + error.message;
+    analysisFindings.replaceChildren(createTextElement("p", "error-state", `Analysis is not available: ${error.message}`));
+    analysisRecommendations.replaceChildren();
+    analysisElement.textContent = error.message;
     setStatus("Analysis backend unavailable.", true);
   }
 });
